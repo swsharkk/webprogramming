@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>환경보호 웹페이지</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {font-family: 'Jua', sans-serif; margin: 0; padding: 0; background-image: url('images/back.png'); background-size: cover;  background-position: center;  background-repeat: no-repeat;  background-attachment: fixed;}
+    .header { position: relative; background-image: url('images/banner.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .header::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); z-index: 1; }
+    .header h1 { font-size: 100px; font-weight: bold; color: white; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6); margin: 0; z-index: 2; }
+    .section { padding: 30px; max-width: 900px; margin: auto; }
+    .btn { background: #28a745; color: white; padding: 10px 20px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+    .btn:hover { background: #218838; }
+    .calendar table { border-collapse: collapse; width: 100%; }
+    .calendar td, .calendar th { border: 1px solid #000; text-align: center; padding: 10px; cursor: pointer; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+    .modal-content { background: white; padding: 20px; margin: 10% auto; width: 90%; max-width: 500px; border-radius: 10px; position: relative; }
+    .close-btn { position: absolute; right: 15px; top: 10px; font-size: 24px; font-weight: bold; cursor: pointer; }
+    #calendar-section { display: none; text-align: center; margin-top: 30px; }
+    .calendar { display: inline-block; margin: auto; }
+    #badge { max-width: 300px; display: none; margin-top: 10px; }
+    .stats-memo-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 40px; text-align: center; }
+    .box { background: white; padding: 20px; border-radius: 10px; flex: 1; min-width: 300px; max-width: 400px; }
+    #memo-output p { background: #e9ffe9; padding: 8px; border-radius: 6px; }
+  
+    .side-banner {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 300px;
+    height: auto;
+    z-index: 999;
+  }
+
+  .left-banner {
+    left: 0;
+    margin-left: 10px;
+  }
+
+  .right-banner {
+    right: 0;
+    margin-right: 10px;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .side-banner {
+      display: none;
+    }
+  }
+  </style>
+</head>
+
+<body>
+  <canvas id="leaf-canvas" style="position: fixed; top: 0; left: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+
+<div class="header"><h1>ZERO WASTES</h1></div>
+<img src="images/left.png" class="side-banner left-banner" alt="왼쪽 배너">
+<img src="images/right.png" class="side-banner right-banner" alt="오른쪽 배너">
+<div class="section">
+  <video width="100%" height="360" controls>
+    <source src="images/video.mp4" type="video/mp4">
+    (환경 관련 영상)
+  </video>
+  
+  <p style="text-align: center; margin: 45px 0;">
+    환경을 보호해야 하는 이유 <br>
+    <br>
+    <br>첫째, 우리가 살고 있는 지구는 유일한 거주 가능한 행성으로서 우리의 생존에 필수적
+    <br>둘째, 자연에서 제공되는 자원을 보존할 수 있고 미래 세대들에게도 지속 가능한 삶을 보장
+    <br>셋째, 환경 파괴는 생태계와 생물 다양성을 위협하여 생태적 균형을 깨뜨림림
+    <br>넷째, 오염된 환경은 우리의 건강에도 직접적인 영향을 미칠 수 있고 이로 인해 질병과 건강 문제
+    <br>다섯째, 지속 가능한 발전을 위해서는 환경을 보호하고 지구 온난화와 같은 글로벌 문제에 대해 적극적으로 대처
+    <br>
+    <br>
+    <br>
+    <br>제로 웨이스트(Zero Waste)<br>
+    <br>일상생활 속에서 쓰레기를 줄이고 자원을 최대한 재사용 
+    <br>자연으로 되돌아갈 수 있는 순환을 실현하려는 것
+    <br>생산-소비-폐기 과정 전체에서 낭비를 최소화하고 지속 가능한 삶을 추구하는 것
+    <br>
+    <br>
+    <br>제로 웨이스트를 해야하는 이유<br>
+    <br>환경오염을 줄이고 기후 위기를 완화
+    <br>자원 낭비를 줄여 경제적이고 효율적인 소비
+    <br>건강하고 의미 있는 삶을 위한 실천
+    <br>
+    
+  </p>
+
+  <div style="text-align: center;">
+    <button class="btn" onclick="toggleCalendar()">환경보호에 직접 참여하기</button>
+  </div>
+
+  
+
+  <div id="calendar-section">
+    <table class="calendar">
+      <tr><th colspan="7">2025년 4월</th></tr>
+      <tr><td>일</td><td>월</td><td>화</td><td>수</td><td>목</td><td>금</td><td>토</td></tr>
+      <script>
+        for (let i = 0; i < 5; i++) {
+          document.write('<tr>');
+          for (let j = 1; j <= 7; j++) {
+            const day = i * 7 + j - 2;
+            if (day < 1 || day > 30) {
+              document.write('<td></td>');
+            } else {
+              document.write(`<td onclick="selectDate('2025-04-${String(day).padStart(2,'0')}')">${day}</td>`);
+            }
+          }
+          document.write('</tr>');
+        }
+      </script>
+    </table>
+  </div>
+
+  
+
+  <div style="text-align: center; margin-top: 20px;">
+    <button class="btn" onclick="toggleMemos()">📝 메모 모아보기</button>
+    <button class="btn" onclick="clearData()">🔄 저장 초기화</button>
+  </div>
+  <div id="memo-output" style="margin-top: 20px;"></div>
+  
+<!-- 가로 스크롤 카드 섹션 -->
+<!-- 가로 스크롤 카드 섹션 (10개 버전) -->
+
+
+
+  <!-- 가로 스크롤용 컨테이너 -->
+  <div style="display: block; overflow-x: auto; white-space: nowrap; padding: 20px 0; background: #f9f9f9;">
+
+  
+  <!-- 카드 시작 -->
+  <div style="display: inline-block; width: 350px; margin: 0 10px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; text-align: center; background: white;">
+    <div style="border-bottom: 1px solid #ccc;">
+      <img src="images/aaa.png" style="width: 100%; display: block;">
+    </div>
+    <div style="padding: 10px;">
+      늘보 딸이, 늘 보따리를 메고 다니는
+      <p>리필스테이션&제로웨이스트샵 ‘늘보따리’</p>
+      <p><a href="https://map.naver.com/p/search/%EB%8A%98%EB%B3%B4%EB%94%B0%EB%A6%AC/place/1117347265?c=15.00,0,0,0,dh&placePath=%3Fentry%253Dbmp" 
+           target="_blank" style="color: #28a745; text-decoration: underline;">
+          서울시 서대문구 연희로4길 24 1층</a></p>
+      <p><a href="https://www.instagram.com/neul.bo.ddari/" 
+           target="_blank" 
+           style="color: #af0606; text-decoration: underline;">
+          운영시간 11:30-22:00</a></p>
+    </div>
+  </div>
+
+  <div style="display: inline-block; width: 350px; margin: 0 10px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; text-align: center; background: white;">
+    <div style="border-bottom: 1px solid #ccc;">
+      <img src="images/bbb.png" style="width: 100%; display: block;">
+    </div>
+    <div style="padding: 10px;">
+      <p><a href="https://gamtanstore.kr/" target="_blank" style="color: #af0606; text-decoration: underline;">
+      <p>탄소배출 감소를 위한 제품을 만들고 판매하는 감탄상회</a></p>
+      <p>욕실,주방 및 일상생활에 유용한 생활용품을 취급</p>
+      <p>제로 웨이스트를 실천하는 사람들의 비건 식품도 제공</p>
+      <p><a href="https://map.naver.com/p/search/%EA%B0%90%ED%83%84%EC%83%81%ED%9A%8C/place/1590442544?c=15.00,0,0,0,dh&placePath=%2Fphoto%3Fentry%253Dbmp" 
+        target="_blank" 
+        style="color: #28a745; text-decoration: underline;">
+        서울시 동작구 양녕로29길 16, 101호</a></p>
+      </div>
+  </div>
+
+  <div style="display: inline-block; width: 350px; margin: 0 10px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; text-align: center; background: white;">
+    <div style="border-bottom: 1px solid #ccc;">
+      <img src="images/ccc.png" style="width: 100%; display: block;">
+    </div>
+    <div style="padding: 10px;">
+      <p><a href="https://www.thanksto.co.kr/main/index.php" target="_blank" style="color: #af0606; text-decoration: underline;">
+      <p>오프라인 매장에서 만날 수 있는 리필 스테이션</a></p>
+      <p>온라인 택배 주문 시 플라스틱을 사용하지 않고 최소 포장</p>
+      <p>매장에서 쓰레기 없이 세제, 잡곡, 커피, 차 구매</p>
+      <p><a href="https://map.naver.com/p/entry/place/1992177367?c=15.00,0,0,0,dh" 
+        target="_blank" 
+        style="color: #28a745; text-decoration: underline;">
+        서울특별시 서초구 효령로 276(서초동) 203</a></p>
+      </div>
+  </div>
+
+  <div style="display: inline-block; width: 350px; margin: 0 10px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; text-align: center; background: white;">
+    <div style="border-bottom: 1px solid #ccc;">
+      <img src="images/ddd.png" style="width: 100%; display: block;">
+    </div>
+    <div style="padding: 10px;">
+      <p><a href="https://aromatica.co.kr/" target="_blank" style="color: #af0606; text-decoration: underline;">
+      <p>아로마테라피의 안전하고 건강한 아름다움을 표방</a></p>
+      <p>합성 향료와 유해한 성분을 없앤 비건 포뮬러 처방</p>
+      <p>엄격한 모니터링과 기준으로 제품을 생산</p>
+      </div>
+  </div>
+
+  <div style="display: inline-block; width: 350px; margin: 0 10px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; text-align: center; background: white;">
+    <div style="border-bottom: 1px solid #ccc;">
+      <img src="images/eee.png" style="width: 100%; display: block;">
+    </div>
+    <div style="padding: 10px;">
+      <p><a href="https://almang.net/" target="_blank" style="color: #af0606; text-decoration: underline;">
+      <p>쓰지 않은 장바구니를 모아 대여하고 알맹이만 구매</a></p>
+      <p>무인 세제 리필 샵과 리필 팝업 샵 운영</p>
+      <p>망원시장 근처에 리필 스테이션 알맹상점 운영</p>
+      <p><a href="https://map.naver.com/p/search/%EC%95%8C%EB%A7%B9%EC%83%81%EC%A0%90?c=15.00,0,0,0,dh" 
+        target="_blank" 
+        style="color: #28a745; text-decoration: underline;">
+        서울 마포구 월드컵로25길 47 3층</a></p>
+      </div>
+  </div>
+
+  <div style="display: inline-block; width: 350px; margin: 0 10px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; text-align: center; background: white;">
+    <div style="border-bottom: 1px solid #ccc;">
+      <img src="images/fff.png" style="width: 100%; display: block;">
+    </div>
+    <div style="padding: 10px;">
+      <p><a href="https://www.instagram.com/earth__us/" target="_blank" style="color: #af0606; text-decoration: underline;">
+      <p>플라스틱 없는 카페 얼스어스</a></p>
+      <p>운좋은 자리에서 맛보는 아늑한 시간</p>
+      <p><a href="https://map.naver.com/p/search/%EC%96%BC%EC%8A%A4%EC%96%B4%EC%8A%A4?c=15.00,0,0,0,dh" 
+        target="_blank" 
+        style="color: #28a745; text-decoration: underline;">
+        서울 종로구 자하문로28가길 1</a></p>
+      </div>
+  </div>
+
+  <div style="display: inline-block; width: 350px; margin: 0 10px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; text-align: center; background: white;">
+    <div style="border-bottom: 1px solid #ccc;">
+      <img src="images/ggg.png" style="width: 100%; display: block;">
+    </div>
+    <div style="padding: 10px;">
+      <p><a href="https://www.onlyeco.co.kr/" target="_blank" style="color: #af0606; text-decoration: underline;">
+      <p>업사이클링을 실천하는 자연상점</a></p>
+      <p>친환경적 환경 키트, 선물 세트 구매 가능</p>
+      <p>공정무역, 제로 웨이스트 간접 체험 가능</p>
+      <p><a href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC%20%EC%84%A0%EC%9C%A0%EB%A1%9C%20130%20%28%EC%96%91%ED%8F%89%EB%8F%993%EA%B0%80%29%20%EC%97%90%EC%9D%B4%EC%8A%A4%ED%95%98%EC%9D%B4%ED%85%8C%ED%81%AC%EC%8B%9C%ED%8B%B03%201105%ED%98%B8/address/14125483.3623778,4512592.9864475,%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC%20%EC%84%A0%EC%9C%A0%EB%A1%9C%20130,new?c=15.00,0,0,0,dh&isCorrectAnswer=true" 
+        target="_blank" 
+        style="color: #28a745; text-decoration: underline;">
+        서울특별시 영등포구 선유로 130 (양평동3가)</a></p>
+      </div>
+  </div>
+
+  <div style="display: inline-block; width: 350px; margin: 0 10px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; text-align: center; background: white;">
+    <div style="border-bottom: 1px solid #ccc;">
+      <img src="images/hhh.png" style="width: 100%; display: block;">
+    </div>
+    <div style="padding: 10px;">
+      <p><a href="https://map.seoul.go.kr/smgis2/short/6N1ZE" target="_blank" style="color: #af0606; text-decoration: underline;">
+      <p>환경> 제로웨이스트 부문</a></p>
+      <p>더 많은 제로웨이스트 상점들을 알수 있는 서울맵지도</p>
+      </div>
+  </div>
+
+
+
+</div>
+      
+
+
+
+</div>
+
+
+
+<!-- 모달 (checklist 부분 수정) -->
+<div id="popup-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h2 id="modal-date-title"></h2>
+    <h3>오늘의 체크리스트</h3>
+    <div id="checklist-inputs" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+    <input class="check-input" type="text" placeholder="- 항목1" style="padding: 10px;">
+    <input class="check-input" type="text" placeholder="- 항목2" style="padding: 10px;">
+    <input class="check-input" type="text" placeholder="- 항목3" style="padding: 10px;">
+    <input class="check-input" type="text" placeholder="- 항목4" style="padding: 10px;">
+    <input class="check-input" type="text" placeholder="- 항목5" style="padding: 10px;">
+    </div>
+
+    <textarea id="modal-memo" rows="10" style="width:100%; margin-top:10px;" placeholder="메모를 작성해보세요."></textarea>
+  </div>
+</div>
+
+
+<script>
+let selectedDate = null;
+
+function toggleCalendar() {
+  const cal = document.getElementById("calendar-section");
+  cal.style.display = (cal.style.display === "block") ? "none" : "block";
+}
+
+function selectDate(date) {
+  selectedDate = date;
+  document.getElementById("modal-date-title").textContent = `${date} 체크리스트`;
+
+  const checklistData = JSON.parse(localStorage.getItem(`checklist-${date}`)) || ["", "", "", "", ""];
+  document.querySelectorAll(".check-input").forEach((input, idx) => {
+    input.value = checklistData[idx] || "";
+  });
+
+  document.getElementById("modal-memo").value = localStorage.getItem(`memo-${date}`) || "";
+  document.getElementById("popup-modal").style.display = "block";
+}
+
+function closeModal() {
+  document.getElementById("popup-modal").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".check-input").forEach((input, idx, allInputs) => {
+    input.addEventListener("input", () => {
+      if (!selectedDate) return;
+      const data = Array.from(allInputs).map(inp => inp.value);
+      localStorage.setItem(`checklist-${selectedDate}`, JSON.stringify(data));
+    });
+  });
+
+  document.getElementById("modal-memo").addEventListener("input", (e) => {
+    if (selectedDate)
+      localStorage.setItem(`memo-${selectedDate}`, e.target.value);
+  });
+});
+
+
+
+function toggleMemos() {
+  const output = document.getElementById("memo-output");
+  if (output.innerHTML !== "") {
+    output.innerHTML = "";
+    return;
+  }
+
+  let result = "<h3>📝 4월 메모 모음</h3>";
+  let hasMemo = false;
+  for (let d = 1; d <= 30; d++) {
+    const date = `2025-04-${String(d).padStart(2, '0')}`;
+    const memo = localStorage.getItem(`memo-${date}`);
+    if (memo && memo.trim() !== "") {
+      result += `<p><b>${date}</b>: ${memo}</p>`;
+      hasMemo = true;
+    }
+  }
+  output.innerHTML = hasMemo ? result : "<p>작성된 메모가 없습니다.</p>";
+}
+
+function clearData() {
+  if (confirm("정말 모든 데이터를 초기화하시겠습니까?")) {
+    for (let i = 1; i <= 30; i++) {
+      const date = `2025-04-${String(i).padStart(2, '0')}`;
+      localStorage.removeItem(`checklist-${date}`);
+      localStorage.removeItem(`memo-${date}`);
+    }
+    alert("모든 데이터가 초기화되었습니다!");
+    location.reload();
+  }
+}
+
+window.addEventListener("click", e => {
+  if (e.target.classList.contains("modal")) closeModal();
+});
+
+const canvas = document.getElementById('leaf-canvas');
+const ctx = canvas.getContext('2d');
+
+let leaves = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// 나뭇잎 이미지 로드
+const leafImg = new Image();
+leafImg.src = 'images/leaf.png';
+
+class Leaf {
+  constructor() {
+    this.reset();
+  }
+  
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * -canvas.height;
+    this.size = 20 + Math.random() * 30;
+    this.speedY = 1 + Math.random() * 2;
+    this.speedX = Math.random() * 1 - 0.5;
+    this.rotation = Math.random() * 360;
+    this.rotationSpeed = Math.random() * 2 - 1;
+  }
+  
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.rotation += this.rotationSpeed;
+    if (this.y > canvas.height) {
+      this.reset();
+    }
+  }
+  
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation * Math.PI / 180);
+    ctx.drawImage(leafImg, -this.size/2, -this.size/2, this.size, this.size);
+    ctx.restore();
+  }
+}
+
+for (let i = 0; i < 10; i++) {
+  leaves.push(new Leaf());
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let leaf of leaves) {
+    leaf.update();
+    leaf.draw();
+  }
+  requestAnimationFrame(animate);
+}
+
+leafImg.onload = animate;
+</script>
+
+</body>
+</html>
